@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drug Focus - تفاصيل الدواء</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2196f3;
+      --primary-dark: #1976d2;
+      --text-color: #333;
+      --light-gray: #f4f7fa;
+      --white: #ffffff;
+      --border-radius: 8px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--light-gray);
+      direction: rtl;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    /* Header Styles */
+    header {
+      background-color: var(--white);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 15px 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-color);
+      transition: transform 0.3s ease;
+    }
+
+    .logo-img:hover {
+      transform: scale(1.1);
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      margin-left: 20px;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-dark);
+    }
+
+    /* Main Content Styles */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 120px 20px 80px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .drug-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-bottom: 30px;
+    }
+
+    .drug-table th, .drug-table td {
+      padding: 18px 20px;
+      border: 1px solid #e0e0e0;
+      text-align: right;
+      font-size: 18px;
+      line-height: 1.6;
+      background-color: var(--white);
+    }
+
+    .drug-table th {
+      background-color: #f0f4f8;
+      color: #444;
+      font-weight: 600;
+      font-size: 19px;
+    }
+
+    .drug-table td {
+      color: var(--text-color);
+      vertical-align: top;
+      cursor: pointer;
+    }
+
+    .drug-table tr:hover td {
+      background-color: #f0f0f0;
+      transform: translateX(-5px);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .drug-table .concentration {
+      text-align: right;
+    }
+
+    .long-text {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-width: 100%;
+      line-height: 1.8;
+    }
+
+    .long-text .section-heading {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+
+    .long-text ol {
+      list-style-type: decimal;
+      padding-right: 25px;
+      margin: 0;
+      padding-top: 5px;
+    }
+
+    .long-text ol li {
+      margin-bottom: 8px;
+      text-align: justify;
+    }
+
+    .error-message {
+      color: #d32f2f;
+      text-align: center;
+      padding: 15px;
+      background-color: #ffebee;
+      border-radius: var(--border-radius);
+      margin-bottom: 30px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: var(--white);
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #e0e0e0;
+      width: 80%;
+      max-width: 700px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      position: relative;
+      animation: animatetop 0.4s ease-out;
+      max-height: 90vh;
+      overflow-y: auto;
+      direction: rtl;
+      text-align: right;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    @keyframes animatetop {
+      from { top: -300px; opacity: 0; }
+      to { top: 0; opacity: 1; }
+    }
+
+    .close-button {
+      color: #aaa;
+      float: left;
+      font-size: 32px;
+      font-weight: bold;
+      position: absolute;
+      left: 15px;
+      top: 5px;
+      cursor: pointer;
+    }
+
+    #modalTitle {
+      font-size: 26px;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+
+    #modalBodyContent p {
+      font-size: 17px;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    #modalBodyContent ol {
+      list-style-type: decimal;
+      padding-right: 25px;
+      margin: 0;
+      padding-top: 5px;
+    }
+
+    #modalBodyContent ol li {
+      margin-bottom: 8px;
+      text-align: justify;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    #modalBodyContent .section-heading {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+
+    #modalBodyContent .long-text {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-width: 100%;
+      line-height: 1.8;
+    }
+
+    #modalBodyContent .long-text br {
+      margin-bottom: 10px;
+    }
+
+    /* Language-specific fonts */
+    *[lang="ar"], html[lang="ar"] body, .container, .drug-table, .modal-content, .long-text {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    *[lang="en"], .modal-content[lang="en"] {
+      font-family: 'Roboto', sans-serif;
+      direction: ltr;
+    }
+
+    /* Footer Styles */
+    footer {
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+
+    .footer-links a {
+      color: var(--white);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: #e0e0e0;
+    }
+
+    .copyright {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      .drug-table th, .drug-table td {
+        font-size: 15px;
+        padding: 12px 15px;
+      }
+
+      .drug-table {
+        border-spacing: 0 6px;
+      }
+
+      .long-text ol {
+        padding-right: 20px;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 20px;
+      }
+
+      .close-button {
+        font-size: 28px;
+      }
+
+      #modalTitle {
+        font-size: 22px;
+      }
+
+      #modalBodyContent p, #modalBodyContent ol li {
+        font-size: 15px;
+      }
+
+      #modalBodyContent .section-heading {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body onload="fetchDrugDetails()">
+  <!-- Header Section -->
+  <header>
+    <div class="header-container">
+      <div class="logo-container">
+        <img src="logoo.png" alt="Drug Focus Logo" class="logo-img">
+        <a href="#" class="logo-text">Drug Focus</a>
+      </div>
+      <nav class="nav-links">
+        <a href="#">الصفحة الرئيسية</a>
+        <a href="results.html" onclick="console.log('Navigating to results.html')">رجوع إلى النتائج</a>
+        <a href="#">عن الموقع</a>
+        <a href="#">اتصل بنا</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <div id="drugDetails"></div>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-button">×</span>
+      <h2 id="modalTitle" lang="ar"></h2>
+      <div id="modalBodyContent"></div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="#">الشروط والأحكام</a>
+        <a href="#">سياسة الخصوصية</a>
+        <a href="#">المساعدة</a>
+        <a href="#">الأسئلة الشائعة</a>
+      </div>
+      <div class="copyright">
+        © 2025 Drug Focus. جميع الحقوق محفوظة.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function formatLongText(text) {
+      if (!text || text.trim() === "" || text.toLowerCase() === "غير متوفر") {
+        return `<span lang="ar">غير متوفر</span>`;
+      }
+
+      let lines = text.split(/\r?\n/);
+      let formattedHtml = '';
+      let currentNumberedItems = [];
+
+      function flushNumberedItems() {
+        if (currentNumberedItems.length === 1) {
+          formattedHtml += `<p lang="ar">${currentNumberedItems[0]}</p>`;
+        } else if (currentNumberedItems.length > 1) {
+          formattedHtml += '<ol>';
+          currentNumberedItems.forEach(item => {
+            const isEnglish = /^[a-zA-Z\s]*$/.test(item);
+            formattedHtml += `<li lang="${isEnglish ? 'en' : 'ar'}">${item}</li>`;
+          });
+          formattedHtml += '</ol>';
+        }
+        currentNumberedItems = [];
+      }
+
+      lines.forEach(line => {
+        const trimmedLine = line.trim();
+
+        if (trimmedLine === "") {
+          flushNumberedItems();
+          formattedHtml += '<br>';
+          return;
+        }
+
+        const isHeading = /:$/.test(trimmedLine);
+
+        if (isHeading) {
+          flushNumberedItems();
+          formattedHtml += `<p class="section-heading" lang="ar"><strong>${trimmedLine}</strong></p>`;
+        } else {
+          currentNumberedItems.push(trimmedLine);
+        }
+      });
+
+      flushNumberedItems();
+      return formattedHtml;
+    }
+
+    async function fetchDrugDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const drugId = urlParams.get("id");
+
+      if (!drugId) {
+        document.getElementById("drugDetails").innerHTML = `<p class="error-message" lang="ar">لم يتم تحديد الدواء</p>`;
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/drug/${drugId}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+        const drug = await response.json();
+        console.log("Drug Data:", drug);
+        displayDrugDetails(drug);
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("drugDetails").innerHTML = `<p class="error-message" lang="ar">حدث خطأ: ${error.message}</p>`;
+      }
+    }
+
+    function displayDrugDetails(drug) {
+      const drugDetails = document.getElementById("drugDetails");
+      const activeIngredient = drug.active_ingredient && drug.active_ingredient.trim() !== "" ? drug.active_ingredient : "غير متوفر";
+      let concentration = drug.concentration || "غير متوفر";
+
+      const isNameEnglish = /^[a-zA-Z\s]*$/.test(drug.name || "");
+      const isActiveIngredientEnglish = /^[a-zA-Z\s]*$/.test(drug.active_ingredient || "");
+
+      let htmlContent = `
+        <table class="drug-table">
+          <tr data-detail-type="الاسم التجاري" data-detail-value="${drug.name || 'غير متوفر'}">
+            <th lang="ar">الاسم التجاري</th>
+            <td lang="${isNameEnglish ? 'en' : 'ar'}">${drug.name || "غير متوفر"}</td>
+          </tr>
+          <tr data-detail-type="المادة الفعالة" data-detail-value="${activeIngredient}">
+            <th lang="ar">المادة الفعالة</th>
+            <td lang="${isActiveIngredientEnglish ? 'en' : 'ar'}">${activeIngredient}</td>
+          </tr>
+          <tr data-detail-type="التركيز" data-detail-value="${concentration}">
+            <th lang="ar">التركيز</th>
+            <td class="concentration" lang="ar">${concentration}</td>
+          </tr>
+          <tr data-detail-type="الشكل الصيدلي" data-detail-value="${drug.form || 'غير متوفر'}">
+            <th lang="ar">الشكل الصيدلي</th>
+            <td lang="ar">${drug.form || "غير متوفر"}</td>
+          </tr>
+          <tr data-detail-type="السعر" data-detail-value="${drug.price ? drug.price.toFixed(2) + ' جنيه' : 'غير متوفر'}">
+            <th lang="ar">السعر</th>
+            <td lang="ar">${drug.price ? drug.price.toFixed(2) : "غير متوفر"} جنيه</td>
+          </tr>
+          <tr data-detail-type="الشركة المصنعة" data-detail-value="${drug.manufacturer || 'غير متوفر'}">
+            <th lang="ar">الشركة المصنعة</th>
+            <td lang="ar">${drug.manufacturer || "غير متوفر"}</td>
+          </tr>
+          <tr data-detail-type="الفئة" data-detail-value="${drug.category || 'غير متوفر'}">
+            <th lang="ar">الفئة</th>
+            <td lang="ar">${drug.category || "غير متوفر"}</td>
+          </tr>
+          <tr data-detail-type="الاستخدامات" data-detail-value-raw="${drug.uses || 'غير متوفر'}">
+            <th lang="ar">الاستخدامات</th>
+            <td class="long-text" lang="ar">${formatLongText(drug.uses)}</td>
+          </tr>
+          <tr data-detail-type="موانع الاستخدام" data-detail-value-raw="${drug.contraindications || 'غير متوفر'}">
+            <th lang="ar">موانع الاستخدام</th>
+            <td class="long-text" lang="ar">${formatLongText(drug.contraindications)}</td>
+          </tr>
+          <tr data-detail-type="احتياطات الاستخدام" data-detail-value-raw="${drug.precautions || 'غير متوفر'}">
+            <th lang="ar">احتياطات الاستخدام</th>
+            <td class="long-text" lang="ar">${formatLongText(drug.precautions)}</td>
+          </tr>
+          <tr data-detail-type="التدخلات الدوائية" data-detail-value-raw="${drug.interactions || 'غير متوفر'}">
+            <th lang="ar">التدخلات الدوائية</th>
+            <td class="long-text" lang="ar">${formatLongText(drug.interactions)}</td>
+          </tr>
+          <tr data-detail-type="ظروف التخزين" data-detail-value-raw="${drug.storage_conditions || 'غير متوفر'}">
+            <th lang="ar">ظروف التخزين</th>
+            <td class="long-text" lang="ar">${formatLongText(drug.storage_conditions)}</td>
+          </tr>
+          <tr data-detail-type="كيفية الاستخدام" data-detail-value-raw="${drug.how_to_use || 'غير متوفر'}">
+            <th lang="ar">كيفية الاستخدام</th>
+            <td class="long-text" lang="ar">${formatLongText(drug.how_to_use)}</td>
+          </tr>
+        </table>
+      `;
+
+      drugDetails.innerHTML = htmlContent;
+
+      const modal = document.getElementById("myModal");
+      const closeButton = document.querySelector(".close-button");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalBodyContent = document.getElementById("modalBodyContent");
+      const tableRows = document.querySelectorAll(".drug-table tr");
+
+      tableRows.forEach(row => {
+        row.addEventListener("click", function() {
+          const detailType = this.getAttribute("data-detail-type");
+          const detailValue = this.getAttribute("data-detail-value");
+          const detailValueRaw = this.getAttribute("data-detail-value-raw");
+
+          modalTitle.textContent = detailType;
+
+          if (detailValueRaw) {
+            modalBodyContent.innerHTML = `<div lang="ar">${formatLongText(detailValueRaw)}</div>`;
+          } else {
+            const isEnglish = detailType === "الاسم التجاري" && /^[a-zA-Z\s]*$/.test(drug.name || "") ||
+                             detailType === "المادة الفعالة" && /^[a-zA-Z\s]*$/.test(drug.active_ingredient || "");
+            modalBodyContent.innerHTML = `<p lang="${isEnglish ? 'en' : 'ar'}">${detailValue}</p>`;
+          }
+
+          modal.style.display = "flex";
+        });
+      });
+
+      closeButton.addEventListener("click", function() {
+        modal.style.display = "none";
+      });
+
+      window.addEventListener("click", function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
